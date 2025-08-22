@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Running Audit...</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #111827;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .loading-box {
+      max-width: 450px;
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .progress {
+      height: 14px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      margin-top: 20px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      background: linear-gradient(90deg, #2563eb, #9333ea);
+    }
+    .status-text {
+      margin-top: 15px;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-box">
+    <div class="spinner-border text-info mb-3" style="width:3rem;height:3rem;"></div>
+    <h3>Auditing Website...</h3>
+    <p class="text-muted">Please wait while we analyze <b>{{ url }}</b></p>
+    
+    <!-- Progress Bar -->
+    <div class="progress">
+      <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+           role="progressbar" style="width: 0%"></div>
+    </div>
+
+    <!-- Status Messages -->
+    <p id="status-text" class="status-text">Initializing...</p>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById("progress-bar");
+    const statusText = document.getElementById("status-text");
+
+    const steps = [
+      "Checking Performance ⚡",
+      "Analyzing SEO 🔍",
+      "Scanning Security 🔒",
+      "Testing Accessibility ♿",
+      "Finalizing Report 📊"
+    ];
+
+    let progress = 0;
+    let stepIndex = 0;
+
+    function updateProgress() {
+      if (progress < 100) {
+        progress += 20;
+        progressBar.style.width = progress + "%";
+        statusText.textContent = steps[stepIndex];
+        stepIndex++;
+        setTimeout(updateProgress, 900); // 0.9s per step
+      } else {
+        // Redirect to actual audit
+        window.location.href = "/audit?url={{ url }}";
+      }
+    }
+
+    updateProgress();
+  </script>
+</body>
+</html>
