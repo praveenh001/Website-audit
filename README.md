@@ -19,6 +19,5 @@ Built for hackathons to help developers quickly find and fix issues on their web
 - **Frontend** – HTML, CSS, JavaScript  
 - **Backend** – Flask (Python)  
 - **Libraries** – Requests, BeautifulSoup, Matplotlib/Plotly  
-- **Deployment** – Render / Vercel / Heroku (as per hackathon setup)  
 
 ---
