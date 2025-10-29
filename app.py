@@ -15,11 +15,8 @@ logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %
 logger = logging.getLogger(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_DIR = os.path.join(BASE_DIR, "static")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 
-if not os.path.exists(STATIC_DIR):
-    os.makedirs(STATIC_DIR)
 if not os.path.exists(TEMPLATES_DIR):
     os.makedirs(TEMPLATES_DIR)
 
@@ -47,12 +44,14 @@ def check_requirements():
 
     return True, None, chrome_path
 
+
 @app.route("/", methods=["GET"])
 def landing():
     req_status, req_error, _ = check_requirements()
     if not req_status:
         return render_template("landing.html", error=req_error)
     return render_template("landing.html")
+
 
 # ---- New Loading Page ----
 @app.route("/loading", methods=["GET"])
@@ -61,6 +60,7 @@ def loading():
     if not url:
         return redirect(url_for("landing", error="Please provide a URL"))
     return render_template("loading.html", url=url)
+
 
 # ---- Audit Page ----
 @app.route("/audit", methods=["GET"])
@@ -112,7 +112,6 @@ def audit():
             if score is not None:
                 scores[cat] = round(score * 100, 2)
 
-        # Performance metrics
         audits = report.get("audits", {})
         perf_metrics = {
             "First Contentful Paint": audits.get("first-contentful-paint", {}).get("numericValue", "N/A"),
@@ -122,7 +121,6 @@ def audit():
             "Cumulative Layout Shift": audits.get("cumulative-layout-shift", {}).get("numericValue", "N/A"),
         }
 
-        # SEO insights
         seo_issues = []
         seo_category = categories.get("seo", {})
         for audit_ref in seo_category.get("auditRefs", []):
@@ -130,7 +128,6 @@ def audit():
             if audit and audit.get("score") is not None and audit["score"] < 1:
                 seo_issues.append(audit["title"])
 
-        # Accessibility issues
         a11y_issues = []
         a11y_category = categories.get("accessibility", {})
         for audit_ref in a11y_category.get("auditRefs", []):
@@ -138,7 +135,6 @@ def audit():
             if audit and audit.get("score") is not None and audit["score"] < 1:
                 a11y_issues.append(audit["title"])
 
-        # Best Practices / Security issues
         security_issues = []
         bp_category = categories.get("best-practices", {})
         for audit_ref in bp_category.get("auditRefs", []):
