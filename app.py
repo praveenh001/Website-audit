@@ -23,35 +23,36 @@ if not os.path.exists(STATIC_DIR):
 if not os.path.exists(TEMPLATES_DIR):
     os.makedirs(TEMPLATES_DIR)
 
-
 # ---- Check Requirements ----
 def check_requirements():
     lh_path = shutil.which("lighthouse") or shutil.which("lighthouse.cmd")
     if not lh_path:
-        return False, "Lighthouse not found. Install with: npm install -g lighthouse"
+        return False, "Lighthouse not found. Install with: npm install -g lighthouse", None
 
-    # Chrome check
     possible_chrome_paths = [
-        shutil.which("chrome"),
         shutil.which("google-chrome"),
+        shutil.which("google-chrome-stable"),
+        shutil.which("chrome"),
+        shutil.which("chromium"),
+        shutil.which("chromium-browser"),
         shutil.which("chrome.exe"),
         r"C:\Program Files\Google\Chrome\Application\chrome.exe",
         r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/usr/bin/google-chrome",
     ]
-    chrome_path = next((p for p in possible_chrome_paths if p and os.path.exists(p)), None)
+    chrome_path = next((p for p in possible_chrome_paths if p), None)
     if not chrome_path:
-        return False, "Google Chrome not found. Please install Chrome."
+        return False, "Google Chrome not found. Please install Chrome.", None
 
-    return True, None
-
+    return True, None, chrome_path
 
 @app.route("/", methods=["GET"])
 def landing():
-    req_status, req_error = check_requirements()
+    req_status, req_error, _ = check_requirements()
     if not req_status:
         return render_template("landing.html", error=req_error)
     return render_template("landing.html")
-
 
 # ---- New Loading Page ----
 @app.route("/loading", methods=["GET"])
@@ -61,34 +62,36 @@ def loading():
         return redirect(url_for("landing", error="Please provide a URL"))
     return render_template("loading.html", url=url)
 
-
 # ---- Audit Page ----
 @app.route("/audit", methods=["GET"])
 def audit():
     url = request.args.get("url", "").strip()
     logger.info(f"Auditing URL: {url}")
-
     if not url.startswith(("http://", "https://")):
         return render_template("landing.html", error="Please include http:// or https:// in your URL")
 
-    report_path = os.path.join(BASE_DIR, f"report_{uuid.uuid4().hex}.json")
+    req_status, req_error, chrome_path = check_requirements()
+    if not req_status:
+        return render_template("landing.html", error=req_error)
 
+    report_path = os.path.join(BASE_DIR, f"report_{uuid.uuid4().hex}.json")
     try:
         lh_path = shutil.which("lighthouse") or shutil.which("lighthouse.cmd")
-        if not lh_path:
-            return render_template("landing.html", error="Lighthouse not installed.")
+        command = [
+            lh_path, url,
+            "--output=json",
+            f"--output-path={report_path}",
+            "--quiet",
+            "--only-categories=performance,seo,accessibility,best-practices",
+            "--chrome-flags=--headless --no-sandbox --disable-gpu --disable-web-security"
+        ]
+        if chrome_path:
+            command += ["--chrome-path", chrome_path]
 
-        # Run lighthouse (all categories, quiet mode)
         start_time = time.time()
         result = subprocess.run(
-            [
-                lh_path, url,
-                "--output=json",
-                f"--output-path={report_path}",
-                "--quiet",
-                "--chrome-flags=--headless --no-sandbox --disable-gpu --disable-web-security"
-            ],
-            capture_output=True, encoding="utf-8", timeout=90, cwd=BASE_DIR
+            command,
+            capture_output=True, text=True, timeout=300, cwd=BASE_DIR
         )
         logger.debug(f"Lighthouse run time: {time.time()-start_time:.2f}s")
 
@@ -101,45 +104,49 @@ def audit():
         with open(report_path, "r", encoding="utf-8") as f:
             report = json.load(f)
 
-        # Clean up
-        os.remove(report_path)
-
         # ---- Extract Insights ----
         categories = report.get("categories", {})
-        scores = {cat: round(details["score"] * 100, 2) for cat, details in categories.items() if details.get("score") is not None}
+        scores = {}
+        for cat, details in categories.items():
+            score = details.get("score")
+            if score is not None:
+                scores[cat] = round(score * 100, 2)
 
         # Performance metrics
+        audits = report.get("audits", {})
         perf_metrics = {
-            "First Contentful Paint": report["audits"]["first-contentful-paint"]["numericValue"],
-            "Largest Contentful Paint": report["audits"]["largest-contentful-paint"]["numericValue"],
-            "Time to Interactive": report["audits"]["interactive"]["numericValue"],
-            "Total Blocking Time": report["audits"]["total-blocking-time"]["numericValue"],
-            "Cumulative Layout Shift": report["audits"]["cumulative-layout-shift"]["numericValue"],
+            "First Contentful Paint": audits.get("first-contentful-paint", {}).get("numericValue", "N/A"),
+            "Largest Contentful Paint": audits.get("largest-contentful-paint", {}).get("numericValue", "N/A"),
+            "Time to Interactive": audits.get("interactive", {}).get("numericValue", "N/A"),
+            "Total Blocking Time": audits.get("total-blocking-time", {}).get("numericValue", "N/A"),
+            "Cumulative Layout Shift": audits.get("cumulative-layout-shift", {}).get("numericValue", "N/A"),
         }
 
         # SEO insights
         seo_issues = []
-        for audit_ref in categories.get("seo", {}).get("auditRefs", []):
-            audit = report["audits"].get(audit_ref["id"])
+        seo_category = categories.get("seo", {})
+        for audit_ref in seo_category.get("auditRefs", []):
+            audit = audits.get(audit_ref["id"])
             if audit and audit.get("score") is not None and audit["score"] < 1:
                 seo_issues.append(audit["title"])
 
         # Accessibility issues
         a11y_issues = []
-        for audit_ref in categories.get("accessibility", {}).get("auditRefs", []):
-            audit = report["audits"].get(audit_ref["id"])
+        a11y_category = categories.get("accessibility", {})
+        for audit_ref in a11y_category.get("auditRefs", []):
+            audit = audits.get(audit_ref["id"])
             if audit and audit.get("score") is not None and audit["score"] < 1:
                 a11y_issues.append(audit["title"])
 
         # Best Practices / Security issues
         security_issues = []
-        for audit_ref in categories.get("best-practices", {}).get("auditRefs", []):
-            audit = report["audits"].get(audit_ref["id"])
+        bp_category = categories.get("best-practices", {})
+        for audit_ref in bp_category.get("auditRefs", []):
+            audit = audits.get(audit_ref["id"])
             if audit and audit.get("score") is not None and audit["score"] < 1:
                 security_issues.append(audit["title"])
 
         timestamp = datetime.now().strftime("%b %d, %Y %H:%M")
-
         return render_template(
             "results.html",
             url=url,
@@ -153,9 +160,13 @@ def audit():
 
     except subprocess.TimeoutExpired:
         return render_template("landing.html", error="Audit timed out. Try again.")
+    except json.JSONDecodeError:
+        return render_template("landing.html", error="Failed to parse Lighthouse report.")
     except Exception as e:
         return render_template("landing.html", error=f"Unexpected error: {str(e)}")
-
+    finally:
+        if os.path.exists(report_path):
+            os.remove(report_path)
 
 if __name__ == "__main__":
     app.run(debug=True)
