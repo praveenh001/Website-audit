@@ -1,194 +1,446 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Audit Results - {{ url }}</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Audit Results – WebAudit Pro</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
   <style>
+    :root {
+      --bg-dark: #000000;
+      --card-bg: rgba(10, 10, 25, 0.9);
+      --text-primary: #ffffff;
+      --text-secondary: #c8d0ff;
+      --neon-gradient: linear-gradient(135deg, #00d4ff, #7c3aed, #ff4ade);
+      --border-glow: rgba(0, 212, 255, 0.45);
+      --accent-blue: #00d4ff;
+      --accent-purple: #7c3aed;
+      --accent-pink: #ff4ade;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+      background: var(--bg-dark);
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      position: relative;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
     }
 
-    .container {
-      max-width: 1000px;
+    /* === COSMIC VOID OVERLAY === */
+    .nebula {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 30% 40%, rgba(0,212,255,.08), transparent 50%),
+        radial-gradient(circle at 70% 60%, rgba(124,58,237,.07), transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255,74,222,.05), transparent 60%);
+      background-size: 200% 200%;
+      animation: nebulaDrift 30s ease infinite;
+      z-index: 0;
+      pointer-events: none;
+      filter: blur(40px);
+    }
+    @keyframes nebulaDrift {
+      0%, 100% { background-position: 0% 50%, 100% 50%, 50% 50%; }
+      50% { background-position: 100% 50%, 0% 50%, 50% 50%; }
     }
 
-    /* Card styling */
-    .card {
-      border: none;
-      border-radius: 14px;
-      background: #1e293b;
-      box-shadow: 0 6px 25px rgba(0,0,0,0.6);
-      color: #e2e8f0;
-    }
-    .card-header {
-      border-radius: 14px 14px 0 0 !important;
-      background: transparent;
-      font-weight: 600;
-      font-size: 1.05rem;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    /* Scores */
-    .score-box {
-      font-size: 20px;
-      font-weight: bold;
-      background: linear-gradient(135deg, #2563eb, #9333ea);
-      color: #fff;
+    .stars { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .star {
+      position: absolute;
+      background: white;
       border-radius: 50%;
-      width: 70px;
-      height: 70px;
+      box-shadow: 0 0 8px rgba(255,255,255,.8);
+      animation: twinkle linear infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    .cosmic-dust { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .dust {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      background: rgba(200,208,255,.6);
+      border-radius: 50%;
+      animation: dustFloat linear infinite;
+    }
+    @keyframes dustFloat {
+      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { transform: translateY(-100px) translateX(80px); opacity: 0; }
+    }
+
+    .gravity-wave {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 600px;
+      height: 600px;
+      border: 1px solid rgba(0,212,255,.1);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: ripple 6s ease-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    @keyframes ripple {
+      0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.5; }
+      100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+    }
+
+    /* Header */
+    header {
+      padding: 1rem 1.5rem;
+      background: rgba(5,5,15,.95);
+      backdrop-filter: blur(25px);
+      border-bottom: 1px solid rgba(0,212,255,.3);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .navbar-brand {
+      font-weight: 800;
+      font-size: 1.6rem;
+      background: var(--neon-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+      text-shadow: 0 0 25px rgba(0,212,255,.6);
+    }
+
+    /* Main Content */
+    .results-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem 1rem;
+      position: relative;
+      z-index: 2;
+      overflow-y: auto;
+    }
+
+    .page-title {
+      font-size: 2.8rem;
+      font-weight: 900;
+      background: var(--neon-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 30px rgba(0,212,255,.7);
+    }
+
+    .url-display {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: 500;
+      text-shadow: 0 1px 6px rgba(0,0,0,.6);
+    }
+
+    /* Score Cards Grid */
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1.2rem;
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 2.5rem;
+    }
+
+    .score-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 1.4rem;
+      text-align: center;
+      border: 1px solid var(--border-glow);
+      backdrop-filter: blur(28px);
+      box-shadow: 
+        0 12px 35px rgba(0,0,0,.7),
+        0 0 35px rgba(0,212,255,.3),
+        inset 0 1px 0 rgba(255,255,255,.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .score-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: var(--neon-gradient);
+      border-radius: 22px;
+      z-index: -1;
+      opacity: .7;
+      animation: borderShift 10s linear infinite;
+      filter: blur(2px);
+    }
+    @keyframes borderShift { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+
+    .score-label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .score-value {
+      font-size: 2.2rem;
+      font-weight: 900;
+      background: var(--neon-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 20px rgba(0,212,255,.8);
+    }
+
+    /* Issues Sections */
+    .issues-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 2rem;
+    }
+
+    .issue-card {
+      flex: 1;
+      min-width: 300px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 1.6rem;
+      border: 1px solid var(--border-glow);
+      backdrop-filter: blur(28px);
+      box-shadow: 
+        0 15px 40px rgba(0,0,0,.7),
+        0 0 40px rgba(0,212,255,.3),
+        inset 0 1px 0 rgba(255,255,255,.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .issue-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: var(--neon-gradient);
+      border-radius: 26px;
+      z-index: -1;
+      opacity: .75;
+      animation: borderShift 12s linear infinite;
+      filter: blur(2.5px);
+    }
+
+    .issue-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.9rem;
       display: flex;
       align-items: center;
-      justify-content: center;
-      margin: 0 auto 10px;
-      box-shadow: 0 0 12px rgba(147, 51, 234, 0.6);
+      gap: 0.5rem;
     }
 
-    /* Performance metric boxes */
-    .metric-box {
-      background: #334155;
-      border-radius: 12px;
-      padding: 15px;
-      transition: transform 0.2s;
+    .issue-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
     }
-    .metric-box:hover {
-      transform: translateY(-4px);
+
+    .issue-list li {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      padding: 0.45rem 0;
+      border-bottom: 1px dashed rgba(200,208,255,.2);
+      position: relative;
+      padding-left: 1.2rem;
     }
-    .metric-value {
+
+    .issue-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
       font-weight: bold;
-      font-size: 1.05rem;
-      color: #38bdf8;
     }
 
-    /* List items */
-    .list-group-item {
-      background: #1e293b;
-      color: #e2e8f0;
+    .issue-list li:last-child {
+      border-bottom: none;
+    }
+
+    /* CTA Button */
+    .cta-button {
+      margin-top: 1.5rem;
+      background: var(--neon-gradient);
+      color: white;
+      font-weight: 700;
+      padding: 13px 28px;
       border: none;
-    }
-    .list-group-item:hover {
-      background: #334155;
+      border-radius: 14px;
+      font-size: 1rem;
+      transition: all .3s ease;
+      box-shadow: 0 8px 25px rgba(124,58,237,.6);
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: inline-block;
     }
 
-    /* Button */
-    .btn-outline-primary {
-      border: 2px solid #38bdf8;
-      color: #38bdf8;
-      border-radius: 10px;
-      transition: all 0.3s;
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent);
+      transition: 0.9s;
     }
-    .btn-outline-primary:hover {
-      background: #38bdf8;
-      color: #0f172a;
-      transform: translateY(-2px);
+
+    .cta-button:hover::before { left: 100%; }
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 35px rgba(124,58,237,.9);
+    }
+
+    /* Footer */
+    .footer-text {
+      text-align: center;
+      color: rgba(200,208,255,.7);
+      font-size: 0.85rem;
+      margin-top: 2rem;
+      text-shadow: 0 1px 4px rgba(0,0,0,.6);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page-title { font-size: 2.3rem; }
+      .score-grid { grid-template-columns: repeat(2, 1fr); }
+      .issues-row { flex-direction: column; }
+      .issue-card { min-width: 100%; }
+    }
+
+    @media (max-width: 576px) {
+      .page-title { font-size: 2rem; }
+      .score-grid { grid-template-columns: 1fr; }
+      .cta-button { width: 100%; }
     }
   </style>
 </head>
 <body>
-  <div class="container my-5">
 
-    <!-- Header -->
-    <div class="text-center mb-5">
-      <h1 class="fw-bold text-white">🚀 Audit Results</h1>
-      <p class="card-header text-danger">{{ url }} | <small>{{ timestamp }}</small></p>
-    </div>
+  <!-- === COSMIC VOID OVERLAY === -->
+  <div class="nebula"></div>
+  <div class="stars" id="stars"></div>
+  <div class="cosmic-dust" id="dust"></div>
+  <div class="gravity-wave"></div>
 
-    <!-- Category Scores -->
-    <div class="row text-center mb-4">
-      {% for cat, score in scores.items() %}
-      <div class="col-md-3 col-6 mb-3">
-        <div class="card p-3">
-          <h6 class="text-uppercase">{{ cat }}</h6>
-          <div class="score-box">{{ score }}%</div>
-        </div>
+  <!-- Header -->
+  <header>
+    <a class="navbar-brand" href="/">WebAudit Pro</a>
+  </header>
+
+  <!-- Main Results -->
+  <div class="results-container">
+    <h1 class="page-title">Audit Report</h1>
+    <p class="url-display">Scanned: <strong>{{ url }}</strong></p>
+
+    <!-- Score Cards -->
+    <div class="score-grid">
+      {% for key, value in scores.items() %}
+      <div class="score-card">
+        <div class="score-label">{{ key }}</div>
+        <div class="score-value">{{ value }}%</div>
       </div>
       {% endfor %}
     </div>
 
-    <!-- Performance Metrics -->
-    <div class="card mb-4">
-      <div class="card-header text-info">⚡ Performance Metrics</div>
-      <div class="card-body">
-        <div class="row">
-          {% for key, value in perf_metrics.items() %}
-          <div class="col-md-4 mb-3">
-            <div class="metric-box">
-              <h6 class="mb-1">{{ key }}</h6>
-              <div class="metric-value">{{ value }} ms</div>
-            </div>
-          </div>
+    <!-- Issues -->
+    <div class="issues-row">
+      <div class="issue-card">
+        <h3 class="issue-title">SEO Issues</h3>
+        <ul class="issue-list">
+          {% for issue in seo_issues %}
+          <li>{{ issue }}</li>
           {% endfor %}
-        </div>
+          {% if seo_issues|length == 0 %}
+          <li>No SEO issues found.</li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <div class="issue-card">
+        <h3 class="issue-title">Accessibility Issues</h3>
+        <ul class="issue-list">
+          {% for issue in a11y_issues %}
+          <li>{{ issue }}</li>
+          {% endfor %}
+          {% if a11y_issues|length == 0 %}
+          <li>No accessibility issues found.</li>
+          {% endif %}
+        </ul>
       </div>
     </div>
 
-    <!-- SEO Issues -->
-    <div class="card mb-4">
-      <div class="card-header text-success">🔍 SEO Issues</div>
-      <div class="card-body">
-        {% if seo_issues %}
-          <ul class="list-group">
-            {% for issue in seo_issues %}
-            <li class="list-group-item">
-              {{ issue }}
-            </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="text-success mb-0">✅ No SEO issues found.</p>
-        {% endif %}
-      </div>
-    </div>
+    <!-- CTA -->
+    <a href="/" class="cta-button">Run Another Audit</a>
 
-    <!-- Accessibility Issues -->
-    <div class="card mb-4">
-      <div class="card-header text-warning">👁 Accessibility Issues</div>
-      <div class="card-body">
-        {% if a11y_issues %}
-          <ul class="list-group">
-            {% for issue in a11y_issues %}
-            <li class="list-group-item">
-              {{ issue }}
-            </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="text-success mb-0">✅ No accessibility issues found.</p>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Security & Best Practices -->
-    <div class="card mb-4">
-      <div class="card-header text-danger">🛡 Security / Best Practices</div>
-      <div class="card-body">
-        {% if security_issues %}
-          <ul class="list-group">
-            {% for issue in security_issues %}
-            <li class="list-group-item">
-              {{ issue }}
-            </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="text-success mb-0">✅ No security issues found.</p>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Back Button -->
-    <div class="text-center mt-4">
-      <a href="/" class="btn btn-outline-primary">🔄 Audit Another URL</a>
-    </div>
-
+    <p class="footer-text">Generated on {{ timestamp }}</p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Star & Dust Generator -->
+  <script>
+    const starsContainer = document.getElementById('stars');
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      const size = Math.random() * 2 + 0.5;
+      star.style.width = star.style.height = `${size}px`;
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+      star.style.animationDelay = `${Math.random() * 3}s`;
+      starsContainer.appendChild(star);
+    }
+
+    const dustContainer = document.getElementById('dust');
+    for (let i = 0; i < 50; i++) {
+      const dust = document.createElement('div');
+      dust.classList.add('dust');
+      dust.style.left = `${Math.random() * 100}vw`;
+      dust.style.animationDuration = `${Math.random() * 25 + 15}s`;
+      dust.style.animationDelay = `${Math.random() * 10}s`;
+      dustContainer.appendChild(dust);
+    }
+
+    setInterval(() => {
+      const wave = document.createElement('div');
+      wave.classList.add('gravity-wave');
+      document.body.appendChild(wave);
+      setTimeout(() => wave.remove(), 6000);
+    }, 3000);
+  </script>
 </body>
 </html>

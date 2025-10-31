@@ -1,168 +1,122 @@
-from flask import Flask, request, render_template, redirect, url_for
-import subprocess
-import json
-import os
-import uuid
-import shutil
-import logging
-import time
+from flask import Flask, render_template, request
+import requests
 from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = "your_secret_key"
 
-# Setup logging
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
+# ----------------------------------------
+# 🔹 GOOGLE PAGESPEED CONFIGURATION
+# ----------------------------------------
+API_KEY = "AIzaSyDR9U9zPn-QXuk4Ny0XZo83uryGh_aGjTI"  # Replace with your real API key
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
-
-if not os.path.exists(TEMPLATES_DIR):
-    os.makedirs(TEMPLATES_DIR)
-
-# ---- Check Requirements ----
-def check_requirements():
-    lh_path = shutil.which("lighthouse") or shutil.which("lighthouse.cmd")
-    if not lh_path:
-        return False, "Lighthouse not found. Install with: npm install -g lighthouse", None
-
-    possible_chrome_paths = [
-        shutil.which("google-chrome"),
-        shutil.which("google-chrome-stable"),
-        shutil.which("chrome"),
-        shutil.which("chromium"),
-        shutil.which("chromium-browser"),
-        shutil.which("chrome.exe"),
-        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-        "/usr/bin/google-chrome",
-    ]
-    chrome_path = next((p for p in possible_chrome_paths if p), None)
-    if not chrome_path:
-        return False, "Google Chrome not found. Please install Chrome.", None
-
-    return True, None, chrome_path
-
-
-@app.route("/", methods=["GET"])
-def landing():
-    req_status, req_error, _ = check_requirements()
-    if not req_status:
-        return render_template("landing.html", error=req_error)
+# ----------------------------------------
+# 🔹 HOME ROUTE
+# ----------------------------------------
+@app.route("/")
+def home():
     return render_template("landing.html")
 
-
-# ---- New Loading Page ----
-@app.route("/loading", methods=["GET"])
-def loading():
-    url = request.args.get("url", "").strip()
-    if not url:
-        return redirect(url_for("landing", error="Please provide a URL"))
-    return render_template("loading.html", url=url)
-
-
-# ---- Audit Page ----
+# ----------------------------------------
+# 🔹 AUDIT ROUTE
+# ----------------------------------------
 @app.route("/audit", methods=["GET"])
 def audit():
     url = request.args.get("url", "").strip()
-    logger.info(f"Auditing URL: {url}")
-    if not url.startswith(("http://", "https://")):
-        return render_template("landing.html", error="Please include http:// or https:// in your URL")
+    if not url:
+        return render_template("landing.html", error="Please enter a valid URL")
 
-    req_status, req_error, chrome_path = check_requirements()
-    if not req_status:
-        return render_template("landing.html", error=req_error)
-
-    report_path = os.path.join(BASE_DIR, f"report_{uuid.uuid4().hex}.json")
     try:
-        lh_path = shutil.which("lighthouse") or shutil.which("lighthouse.cmd")
-        command = [
-            lh_path, url,
-            "--output=json",
-            f"--output-path={report_path}",
-            "--quiet",
-            "--only-categories=performance,seo,accessibility,best-practices",
-            "--chrome-flags=--headless --no-sandbox --disable-gpu --disable-web-security"
-        ]
-        if chrome_path:
-            command += ["--chrome-path", chrome_path]
-
-        start_time = time.time()
-        result = subprocess.run(
-            command,
-            capture_output=True, text=True, timeout=300, cwd=BASE_DIR
+        # Fetch PageSpeed Insights data for all categories
+        api_url = (
+            f"https://www.googleapis.com/pagespeedonline/v5/runPagespeed"
+            f"?url={url}&key={API_KEY}&strategy=desktop"
+            f"&category=performance&category=accessibility"
+            f"&category=best-practices&category=seo"
         )
-        logger.debug(f"Lighthouse run time: {time.time()-start_time:.2f}s")
+        response = requests.get(api_url)
+        data = response.json()
 
-        if result.returncode != 0:
-            return render_template("landing.html", error=f"Lighthouse failed: {result.stderr[:200]}")
+        if "lighthouseResult" not in data:
+            err_msg = data.get("error", {}).get("message", "Unknown API error.")
+            return render_template(
+                "results.html",
+                url=url,
+                scores={},
+                seo_issues=[f"⚠ API Error: {err_msg}"],
+                a11y_issues=[],
+                timestamp=datetime.now().strftime("%b %d, %Y %H:%M"),
+            )
 
-        if not os.path.exists(report_path):
-            return render_template("landing.html", error="No report generated. Website may block headless browsers.")
+        lighthouse = data["lighthouseResult"]
+        categories = lighthouse.get("categories", {})
+        audits = lighthouse.get("audits", {})
 
-        with open(report_path, "r", encoding="utf-8") as f:
-            report = json.load(f)
+        # ✅ Extract category scores safely
+        def get_score(cat):
+            s = categories.get(cat, {}).get("score", 0)
+            return round(s * 100) if s is not None else 0
 
-        # ---- Extract Insights ----
-        categories = report.get("categories", {})
-        scores = {}
-        for cat, details in categories.items():
-            score = details.get("score")
-            if score is not None:
-                scores[cat] = round(score * 100, 2)
-
-        audits = report.get("audits", {})
-        perf_metrics = {
-            "First Contentful Paint": audits.get("first-contentful-paint", {}).get("numericValue", "N/A"),
-            "Largest Contentful Paint": audits.get("largest-contentful-paint", {}).get("numericValue", "N/A"),
-            "Time to Interactive": audits.get("interactive", {}).get("numericValue", "N/A"),
-            "Total Blocking Time": audits.get("total-blocking-time", {}).get("numericValue", "N/A"),
-            "Cumulative Layout Shift": audits.get("cumulative-layout-shift", {}).get("numericValue", "N/A"),
+        scores = {
+            "Performance": get_score("performance"),
+            "Accessibility": get_score("accessibility"),
+            "Best Practices": get_score("best-practices"),
+            "SEO": get_score("seo"),
         }
 
+        # ✅ Extract issues safely
         seo_issues = []
-        seo_category = categories.get("seo", {})
-        for audit_ref in seo_category.get("auditRefs", []):
-            audit = audits.get(audit_ref["id"])
-            if audit and audit.get("score") is not None and audit["score"] < 1:
-                seo_issues.append(audit["title"])
-
         a11y_issues = []
-        a11y_category = categories.get("accessibility", {})
-        for audit_ref in a11y_category.get("auditRefs", []):
-            audit = audits.get(audit_ref["id"])
-            if audit and audit.get("score") is not None and audit["score"] < 1:
-                a11y_issues.append(audit["title"])
 
-        security_issues = []
-        bp_category = categories.get("best-practices", {})
-        for audit_ref in bp_category.get("auditRefs", []):
-            audit = audits.get(audit_ref["id"])
-            if audit and audit.get("score") is not None and audit["score"] < 1:
-                security_issues.append(audit["title"])
+        for audit_id, audit in audits.items():
+            if not isinstance(audit, dict):
+                continue
 
-        timestamp = datetime.now().strftime("%b %d, %Y %H:%M")
+            score = audit.get("score", 1)
+            if score is None:  # skip non-scored audits
+                continue
+
+            # If audit failed (score < 1)
+            if score < 1:
+                title = audit.get("title", "Untitled")
+                description = audit.get("description", "")
+                # SEO-related
+                if any(x in audit_id.lower() for x in ["seo", "meta", "viewport", "robots", "title"]):
+                    seo_issues.append(f"{title} — {description[:100]}...")
+                # Accessibility-related
+                if any(x in audit_id.lower() for x in ["accessibility", "contrast", "aria", "label", "alt", "button"]):
+                    a11y_issues.append(f"{title} — {description[:100]}...")
+
+        # Remove duplicates
+        seo_issues = list(set(seo_issues))
+        a11y_issues = list(set(a11y_issues))
+
+        if not seo_issues:
+            seo_issues = ["✅ No major SEO issues detected."]
+        if not a11y_issues:
+            a11y_issues = ["✅ No major Accessibility issues detected."]
+
         return render_template(
             "results.html",
             url=url,
             scores=scores,
-            perf_metrics=perf_metrics,
             seo_issues=seo_issues,
             a11y_issues=a11y_issues,
-            security_issues=security_issues,
-            timestamp=timestamp
+            timestamp=datetime.now().strftime("%b %d, %Y %H:%M"),
         )
 
-    except subprocess.TimeoutExpired:
-        return render_template("landing.html", error="Audit timed out. Try again.")
-    except json.JSONDecodeError:
-        return render_template("landing.html", error="Failed to parse Lighthouse report.")
     except Exception as e:
-        return render_template("landing.html", error=f"Unexpected error: {str(e)}")
-    finally:
-        if os.path.exists(report_path):
-            os.remove(report_path)
+        return render_template(
+            "results.html",
+            url=url,
+            scores={},
+            seo_issues=[f"⚠ Error: {str(e)}"],
+            a11y_issues=[],
+            timestamp=datetime.now().strftime("%b %d, %Y %H:%M"),
+        )
 
+# ----------------------------------------
+# 🔹 RUN LOCALLY
+# ----------------------------------------
 if __name__ == "__main__":
     app.run(debug=True)
