@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import requests
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
@@ -8,7 +9,7 @@ app.secret_key = "your_secret_key"
 # ----------------------------------------
 # 🔹 GOOGLE PAGESPEED CONFIGURATION
 # ----------------------------------------
-API_KEY = "AIzaSyDR9U9zPn-QXuk4Ny0XZo83uryGh_aGjTI"  # Replace with your real API key
+API_KEY = "AIzaSyDR9U9zPn-QXuk4Ny0XZo83uryGh_aGjTI"  # Replace with your real Google API key
 
 # ----------------------------------------
 # 🔹 HOME ROUTE
@@ -115,8 +116,10 @@ def audit():
             timestamp=datetime.now().strftime("%b %d, %Y %H:%M"),
         )
 
+
 # ----------------------------------------
-# 🔹 RUN LOCALLY
+# 🔹 RUN LOCALLY OR ON RENDER
 # ----------------------------------------
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # ✅ for Render
+    app.run(host="0.0.0.0", port=port, debug=True)
