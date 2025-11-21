@@ -3,41 +3,353 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loading...</title>
+  <title>Neural Scan In Progress...</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
+    :root {
+      --bg-dark: #000000;
+      --card-bg: rgba(10, 10, 25, 0.85);
+      --text-primary: #ffffff;
+      --text-secondary: #c8d0ff;
+      --neon-gradient: linear-gradient(135deg, #00d4ff, #7c3aed, #ff4ade);
+      --border-glow: rgba(0, 212, 255, 0.45);
+      --accent-blue: #00d4ff;
+      --accent-purple: #7c3aed;
+      --accent-pink: #ff4ade;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      position: relative;
+    }
+
     body {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      background: linear-gradient(135deg, #2563eb, #9333ea);
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      flex-direction: column;
+      gap: 1.5rem;
     }
-    .loader {
-      border: 6px solid rgba(255, 255, 255, 0.3);
-      border-top: 6px solid #fff;
+
+    /* === EXACT SAME COSMIC BACKGROUND AS LANDING PAGE === */
+    .nebula {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(0,212,255,.08), transparent 50%),
+        radial-gradient(circle at 70% 60%, rgba(124,58,237,.07), transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255,74,222,.05), transparent 60%);
+      background-size: 200% 200%;
+      animation: nebulaDrift 30s ease infinite;
+      z-index: 0;
+      pointer-events: none;
+      filter: blur(40px);
+    }
+    @keyframes nebulaDrift {
+      0%, 100% { background-position: 0% 50%, 100% 50%, 50% 50%; }
+      50% { background-position: 100% 50%, 0% 50%, 50% 50%; }
+    }
+
+    .stars { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .star {
+      position: absolute;
+      background: white;
       border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
+      box-shadow: 0 0 8px rgba(255,255,255,.8);
+      animation: twinkle linear infinite;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
     }
+
+    .cosmic-dust { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .dust {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      background: rgba(200,208,255,.6);
+      border-radius: 50%;
+      animation: dustFloat linear infinite;
+    }
+    @keyframes dustFloat {
+      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { transform: translateY(-100px) translateX(80px); opacity: 0; }
+    }
+
+    .gravity-wave {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 600px;
+      height: 600px;
+      border: 1px solid rgba(0,212,255,.1);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: ripple 6s ease-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    @keyframes ripple {
+      0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.5; }
+      100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+    }
+
+    /* === NEURAL NODES (OVERLAY) === */
+    .neural-net {
+      position: absolute; inset: 0; z-index: 1;
+      pointer-events: none;
+    }
+    .node {
+      position: absolute;
+      width: 6px; height: 6px;
+      background: var(--accent-blue);
+      border-radius: 50%;
+      box-shadow: 0 0 15px var(--accent-blue);
+      opacity: 0;
+    }
+    .connection {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+      transform-origin: left;
+      opacity: 0;
+    }
+
+    /* === TERMINAL CARD === */
+    .terminal {
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 1.8rem;
+      width: 90%;
+      max-width: 620px;
+      border: 1px solid var(--border-glow);
+      backdrop-filter: blur(28px);
+      box-shadow:
+        0 15px 45px rgba(0,0,0,.8),
+        0 0 45px rgba(0,212,255,.4),
+        inset 0 1px 0 rgba(255,255,255,.2);
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .95rem;
+      line-height: 1.6;
+    }
+    .terminal::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: var(--neon-gradient);
+      border-radius: 30px;
+      z-index: -1;
+      opacity: .8;
+      animation: borderShift 11s linear infinite;
+      filter: blur(2.5px);
+    }
+    @keyframes borderShift { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+
+    /* === HEADING: PURE WHITE TEXT === */
+    .title {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: #ffffff; /* Pure white */
+      text-shadow: 0 0 30px rgba(0,212,255,.7);
+      margin-bottom: .8rem;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    .scan-line {
+      display: flex; align-items: center; gap: .8rem;
+      opacity: 0;
+      transform: translateY(10px);
+      margin: .25rem 0;
+    }
+    .scan-line.active {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all .3s ease;
+    }
+
+    .status {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #333;
+      flex-shrink: 0;
+    }
+    .status.success { background: #00ff88; box-shadow: 0 0 15px #00ff88; }
+    .status.warning { background: #ffaa00; box-shadow: 0 0 15px #ffaa00; }
+    .status.error { background: #ff4444; box-shadow: 0 0 15px #ff4444; }
+    .status.scanning { background: var(--accent-blue); animation: pulse 1.5s infinite; }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .6; transform: scale(1.3); }
+    }
+
+    .code-fragment { color: var(--accent-blue); font-weight: 700; }
+    .url-display { color: #00ff88; font-weight: 700; word-break: break-all; }
+
+    .progress-bar {
+      height: 5px;
+      background: rgba(255,255,255,.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 1.2rem;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--neon-gradient);
+      border-radius: 3px;
+      animation: scanProgress 2s linear forwards;
+      box-shadow: 0 0 15px rgba(0,212,255,.8);
+    }
+    @keyframes scanProgress { to { width: 100%; } }
+
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
   </style>
 </head>
 <body>
-  <div class="loader"></div>
-  <h2>Analyzing your website...</h2>
+
+  <!-- BACKGROUND LAYERS -->
+  <div class="nebula"></div>
+  <div class="stars" id="stars"></div>
+  <div class="cosmic-dust" id="dust"></div>
+  <div class="gravity-wave"></div>
+
+  <!-- NEURAL NET -->
+  <div class="neural-net" id="neuralNet"></div>
+
+  <!-- TERMINAL CARD -->
+  <div class="terminal">
+    <div class="title">NEURAL SCAN ACTIVE</div>
+    <div id="output"></div>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+  </div>
+
+  <!-- JS -->
   <script>
+    const url = "{{ url }}";
+    const output = document.getElementById('output');
+    const neuralNet = document.getElementById('neuralNet');
+
+    // STARS
+    const starsContainer = document.getElementById('stars');
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      const size = Math.random() * 2 + 0.5;
+      star.style.width = star.style.height = `${size}px`;
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+      star.style.animationDelay = `${Math.random() * 3}s`;
+      starsContainer.appendChild(star);
+    }
+
+    // COSMIC DUST
+    const dustContainer = document.getElementById('dust');
+    for (let i = 0; i < 50; i++) {
+      const dust = document.createElement('div');
+      dust.classList.add('dust');
+      dust.style.left = `${Math.random() * 100}vw`;
+      dust.style.animationDuration = `${Math.random() * 25 + 15}s`;
+      dust.style.animationDelay = `${Math.random() * 10}s`;
+      dustContainer.appendChild(dust);
+    }
+
+    // GRAVITY WAVES
+    setInterval(() => {
+      const wave = document.createElement('div');
+      wave.classList.add('gravity-wave');
+      document.body.appendChild(wave);
+      setTimeout(() => wave.remove(), 6000);
+    }, 3000);
+
+    // SCAN ANIMATION
+    const scanSteps = [
+      { text: `Initializing AI engine...`, status: 'scanning', delay: 300 },
+      { text: `Fetching <span class="url-display">${url}</span>`, status: 'scanning', delay: 500 },
+      { text: `Parsing DOM tree <span class="code-fragment">&lt;html&gt;...&lt;/html&gt;</span>`, status: 'success', delay: 400 },
+      { text: `Detecting 47 performance bottlenecks`, status: 'warning', delay: 300 },
+      { text: `Scanning for XSS, SQLi, CSRF vectors`, status: 'scanning', delay: 400 },
+      { text: `Analyzing Lighthouse metrics`, status: 'success', delay: 300 },
+      { text: `Checking WCAG 2.1 compliance`, status: 'success', delay: 300 },
+      { text: `Neural audit complete. Redirecting...`, status: 'success', delay: 400 }
+    ];
+
+    let currentStep = 0;
+
+    function addLine() {
+      if (currentStep >= scanSteps.length) {
+        setTimeout(() => {
+          window.location.href = `/audit?url=${encodeURIComponent(url)}`;
+        }, 300);
+        return;
+      }
+
+      const step = scanSteps[currentStep];
+      const line = document.createElement('div');
+      line.className = 'scan-line';
+      line.innerHTML = `
+        <div class="status ${step.status}"></div>
+        <div>${step.text}</div>
+      `;
+      output.appendChild(line);
+
+      setTimeout(() => line.classList.add('active'), 50);
+
+      if (currentStep > 1 && currentStep < 7) {
+        createNeuralActivity();
+      }
+
+      currentStep++;
+      setTimeout(addLine, step.delay);
+    }
+
+    function createNeuralActivity() {
+      const node = document.createElement('div');
+      node.className = 'node';
+      node.style.left = Math.random() * 100 + '%';
+      node.style.top = Math.random() * 100 + '%';
+      node.style.animation = `fadeIn .6s forwards, pulse 1.5s infinite`;
+      neuralNet.appendChild(node);
+
+      if (Math.random() > 0.5) {
+        const conn = document.createElement('div');
+        conn.className = 'connection';
+        const angle = Math.random() * 360;
+        const length = 60 + Math.random() * 100;
+        conn.style.left = parseFloat(node.style.left) + '%';
+        conn.style.top = parseFloat(node.style.top) + '%';
+        conn.style.width = length + 'px';
+        conn.style.transform = `rotate(${angle}deg)`;
+        conn.style.animation = `fadeIn .8s forwards`;
+        neuralNet.appendChild(conn);
+      }
+
+      setTimeout(() => node.remove(), 2000);
+    }
+
+    // Start scan
+    setTimeout(addLine, 300);
+
+    // Fallback redirect
     setTimeout(() => {
-      const params = new URLSearchParams(window.location.search);
-      const url = params.get("url");
       if (url) window.location.href = `/audit?url=${encodeURIComponent(url)}`;
-    }, 2000);
+    }, 3000);
   </script>
 </body>
 </html>

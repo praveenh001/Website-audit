@@ -4,10 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WebAudit Pro</title>
-
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-
   <style>
     :root {
       --bg-dark: #000000;
@@ -20,7 +18,6 @@
       --accent-purple: #7c3aed;
       --accent-pink: #ff4ade;
     }
-
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body {
       height: 100%;
@@ -30,19 +27,16 @@
       color: var(--text-primary);
       position: relative;
     }
-
     body {
       display: flex;
       flex-direction: column;
     }
 
     /* === COSMIC VOID OVERLAY === */
-
-    /* 1. Nebula Clouds (Layered Gradients) */
     .nebula {
       position: absolute;
       inset: 0;
-      background: 
+      background:
         radial-gradient(circle at 30% 40%, rgba(0,212,255,.08), transparent 50%),
         radial-gradient(circle at 70% 60%, rgba(124,58,237,.07), transparent 50%),
         radial-gradient(circle at 50% 50%, rgba(255,74,222,.05), transparent 60%);
@@ -57,13 +51,7 @@
       50% { background-position: 100% 50%, 0% 50%, 50% 50%; }
     }
 
-    /* 2. Twinkling Stars */
-    .stars {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
+    .stars { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
     .star {
       position: absolute;
       background: white;
@@ -76,13 +64,7 @@
       50% { opacity: 1; transform: scale(1.3); }
     }
 
-    /* 3. Cosmic Dust Particles */
-    .cosmic-dust {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
+    .cosmic-dust { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
     .dust {
       position: absolute;
       width: 1px;
@@ -98,7 +80,6 @@
       100% { transform: translateY(-100px) translateX(80px); opacity: 0; }
     }
 
-    /* 4. Gravitational Waves (Ripple from Center) */
     .gravity-wave {
       position: absolute;
       top: 50%;
@@ -117,9 +98,6 @@
       100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
     }
 
-    /* === END OVERLAY === */
-
-    /* Header */
     header {
       padding: 1rem 1.5rem;
       background: rgba(5,5,15,.95);
@@ -129,7 +107,6 @@
       position: relative;
       z-index: 10;
     }
-
     .navbar-brand {
       font-weight: 800;
       font-size: 1.6rem;
@@ -141,7 +118,6 @@
       text-shadow: 0 0 25px rgba(0,212,255,.6);
     }
 
-    /* Hero container */
     .hero-container {
       flex: 1;
       display: flex;
@@ -154,7 +130,6 @@
       position: relative;
       z-index: 2;
     }
-
     .hero-content {
       flex: 1;
       min-width: 280px;
@@ -162,7 +137,6 @@
       text-align: center;
       position: relative;
     }
-
     .hero-title {
       font-size: 3.5rem;
       font-weight: 900;
@@ -174,7 +148,6 @@
       background-clip: text;
       text-shadow: 0 0 35px rgba(0,212,255,.7);
     }
-
     .hero-subtitle {
       font-size: 1.05rem;
       color: var(--text-secondary);
@@ -185,7 +158,6 @@
       text-shadow: 0 1px 6px rgba(0,0,0,.6);
     }
 
-    /* Audit Card */
     .audit-card {
       flex: 1;
       min-width: 300px;
@@ -195,7 +167,7 @@
       padding: 1.8rem;
       border: 1px solid var(--border-glow);
       backdrop-filter: blur(28px);
-      box-shadow: 
+      box-shadow:
         0 15px 45px rgba(0,0,0,.8),
         0 0 45px rgba(0,212,255,.4),
         inset 0 1px 0 rgba(255,255,255,.2);
@@ -203,7 +175,6 @@
       overflow: hidden;
       z-index: 2;
     }
-
     .audit-card::before {
       content: '';
       position: absolute;
@@ -230,7 +201,6 @@
       display: inline-block;
       box-shadow: 0 0 18px rgba(0,212,255,.6);
     }
-
     .card-title {
       font-size: 1.6rem;
       font-weight: 800;
@@ -238,14 +208,12 @@
       color: white;
       line-height: 1.2;
     }
-
     .card-desc {
       font-size: .92rem;
       color: var(--text-secondary);
       line-height: 1.45;
       margin-bottom: 1.3rem;
     }
-
     .form-control {
       background: rgba(255,255,255,.15);
       border: 1px solid rgba(255,255,255,.3);
@@ -264,7 +232,6 @@
       box-shadow: 0 0 0 3px rgba(0,212,255,.45);
       outline: none;
     }
-
     .btn-audit {
       width: 100%;
       background: var(--neon-gradient);
@@ -293,7 +260,6 @@
       box-shadow: 0 14px 30px rgba(124,58,237,.8);
     }
 
-    /* Phone */
     .device-mockup {
       width: 190px;
       height: 330px;
@@ -309,8 +275,8 @@
       border-radius: 32px;
       background: linear-gradient(135deg, rgba(0,212,255,.45), rgba(124,58,237,.45));
       border: 2px solid rgba(0,212,255,.9);
-      box-shadow: 
-        0 20px 40px rgba(0,0,0,.8), 
+      box-shadow:
+        0 20px 40px rgba(0,0,0,.8),
         0 0 50px rgba(0,212,255,.55);
       transform: rotateY(-12deg) rotateX(6deg);
       animation: floatCompact 5s ease-in-out infinite;
@@ -345,7 +311,6 @@
       backdrop-filter: blur(12px);
     }
 
-    /* Responsive */
     @media (max-width: 992px) {
       .hero-title { font-size: 3rem; }
       .hero-container { flex-direction: column; text-align: center; gap: 1.2rem; }
@@ -361,19 +326,15 @@
   </style>
 </head>
 <body>
-
-  <!-- === COSMIC VOID OVERLAY === -->
   <div class="nebula"></div>
   <div class="stars" id="stars"></div>
   <div class="cosmic-dust" id="dust"></div>
   <div class="gravity-wave"></div>
 
-  <!-- Header -->
   <header>
     <a class="navbar-brand" href="#">WebAudit Pro</a>
   </header>
 
-  <!-- Hero -->
   <div class="hero-container">
     <div class="hero-content">
       <h1 class="hero-title">Audit. Optimize. Dominate.</h1>
@@ -389,7 +350,8 @@
         Enter your URL and get a comprehensive report in under 60 seconds.
       </p>
 
-      <form method="GET" action="/audit">
+      <!-- FIXED: Now redirects to /loading -->
+      <form method="GET" action="/loading">
         <input type="text" class="form-control" name="url" placeholder="https://example.com" required />
         <button type="submit" class="btn-audit">Start Free Audit</button>
       </form>
@@ -407,10 +369,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Star & Dust Generator -->
   <script>
-    // Twinkling Stars
+    // Stars
     const starsContainer = document.getElementById('stars');
     for (let i = 0; i < 80; i++) {
       const star = document.createElement('div');
@@ -425,7 +385,7 @@
       starsContainer.appendChild(star);
     }
 
-    // Cosmic Dust
+    // Dust
     const dustContainer = document.getElementById('dust');
     for (let i = 0; i < 50; i++) {
       const dust = document.createElement('div');
@@ -436,7 +396,7 @@
       dustContainer.appendChild(dust);
     }
 
-    // Add multiple gravity waves
+    // Gravity Waves
     setInterval(() => {
       const wave = document.createElement('div');
       wave.classList.add('gravity-wave');
