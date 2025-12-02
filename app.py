@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 import requests
 from datetime import datetime
 
@@ -7,6 +7,17 @@ app = Flask(__name__)
 app.secret_key = "your_secret_key"
 
 API_KEY = "AIzaSyDR9U9zPn-QXuk4Ny0XZo83uryGh_aGjTI"  
+
+# -------------------------------
+# 🔹 SEO FILE ROUTES
+# -------------------------------
+@app.route("/robots.txt")
+def robots():
+    return send_from_directory(".", "robots.txt")
+
+@app.route("/sitemap.xml")
+def sitemap():
+    return send_from_directory(".", "sitemap.xml")
 
 
 # ----------------------------------------

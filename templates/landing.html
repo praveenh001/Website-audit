@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WebAudit Pro</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <meta name="title" content="WebAudit Pro – Free Website Performance & SEO Audit Tool">
+  <meta name="description"
+    content="Analyze your website's performance, SEO, accessibility, and security using WebAudit Pro. Get instant audit reports.">
+  <meta name="keywords" content="website audit, seo audit, webaudit, performance test, site analyzer, lighthouse audit">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:title" content="WebAudit Pro – Website Audit Tool">
+  <meta property="og:description" content="Run free SEO & performance audits and download a detailed report.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://website-audit-v3h1.onrender.com/">
+  <meta property="og:image" content="https://website-audit-v3h1.onrender.com/static/preview.png">
+
   <style>
     :root {
       --bg-dark: #000000;
@@ -18,8 +32,15 @@
       --accent-purple: #7c3aed;
       --accent-pink: #ff4ade;
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    html, body {
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
       height: 100%;
       overflow: hidden;
       background: var(--bg-dark);
@@ -27,6 +48,7 @@
       color: var(--text-primary);
       position: relative;
     }
+
     body {
       display: flex;
       flex-direction: column;
@@ -37,47 +59,91 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 30% 40%, rgba(0,212,255,.08), transparent 50%),
-        radial-gradient(circle at 70% 60%, rgba(124,58,237,.07), transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(255,74,222,.05), transparent 60%);
+        radial-gradient(circle at 30% 40%, rgba(0, 212, 255, .08), transparent 50%),
+        radial-gradient(circle at 70% 60%, rgba(124, 58, 237, .07), transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 74, 222, .05), transparent 60%);
       background-size: 200% 200%;
       animation: nebulaDrift 30s ease infinite;
       z-index: 0;
       pointer-events: none;
       filter: blur(40px);
     }
+
     @keyframes nebulaDrift {
-      0%, 100% { background-position: 0% 50%, 100% 50%, 50% 50%; }
-      50% { background-position: 100% 50%, 0% 50%, 50% 50%; }
+
+      0%,
+      100% {
+        background-position: 0% 50%, 100% 50%, 50% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%, 0% 50%, 50% 50%;
+      }
     }
 
-    .stars { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .stars {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
     .star {
       position: absolute;
       background: white;
       border-radius: 50%;
-      box-shadow: 0 0 8px rgba(255,255,255,.8);
+      box-shadow: 0 0 8px rgba(255, 255, 255, .8);
       animation: twinkle linear infinite;
     }
+
     @keyframes twinkle {
-      0%, 100% { opacity: 0.3; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.3); }
+
+      0%,
+      100% {
+        opacity: 0.3;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.3);
+      }
     }
 
-    .cosmic-dust { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .cosmic-dust {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
     .dust {
       position: absolute;
       width: 1px;
       height: 1px;
-      background: rgba(200,208,255,.6);
+      background: rgba(200, 208, 255, .6);
       border-radius: 50%;
       animation: dustFloat linear infinite;
     }
+
     @keyframes dustFloat {
-      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-      10% { opacity: 0.6; }
-      90% { opacity: 0.6; }
-      100% { transform: translateY(-100px) translateX(80px); opacity: 0; }
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.6;
+      }
+
+      90% {
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: translateY(-100px) translateX(80px);
+        opacity: 0;
+      }
     }
 
     .gravity-wave {
@@ -86,27 +152,36 @@
       left: 50%;
       width: 600px;
       height: 600px;
-      border: 1px solid rgba(0,212,255,.1);
+      border: 1px solid rgba(0, 212, 255, .1);
       border-radius: 50%;
       transform: translate(-50%, -50%);
       animation: ripple 6s ease-out infinite;
       z-index: 0;
       pointer-events: none;
     }
+
     @keyframes ripple {
-      0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.5; }
-      100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+      0% {
+        transform: translate(-50%, -50%) scale(0.3);
+        opacity: 0.5;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+      }
     }
 
     header {
       padding: 1rem 1.5rem;
-      background: rgba(5,5,15,.95);
+      background: rgba(5, 5, 15, .95);
       backdrop-filter: blur(25px);
-      border-bottom: 1px solid rgba(0,212,255,.3);
+      border-bottom: 1px solid rgba(0, 212, 255, .3);
       flex-shrink: 0;
       position: relative;
       z-index: 10;
     }
+
     .navbar-brand {
       font-weight: 800;
       font-size: 1.6rem;
@@ -115,7 +190,7 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
       letter-spacing: -0.5px;
-      text-shadow: 0 0 25px rgba(0,212,255,.6);
+      text-shadow: 0 0 25px rgba(0, 212, 255, .6);
     }
 
     .hero-container {
@@ -130,6 +205,7 @@
       position: relative;
       z-index: 2;
     }
+
     .hero-content {
       flex: 1;
       min-width: 280px;
@@ -137,6 +213,7 @@
       text-align: center;
       position: relative;
     }
+
     .hero-title {
       font-size: 3.5rem;
       font-weight: 900;
@@ -146,8 +223,9 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: 0 0 35px rgba(0,212,255,.7);
+      text-shadow: 0 0 35px rgba(0, 212, 255, .7);
     }
+
     .hero-subtitle {
       font-size: 1.05rem;
       color: var(--text-secondary);
@@ -155,7 +233,7 @@
       opacity: .95;
       max-width: 460px;
       margin: 0 auto;
-      text-shadow: 0 1px 6px rgba(0,0,0,.6);
+      text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
     }
 
     .audit-card {
@@ -168,13 +246,14 @@
       border: 1px solid var(--border-glow);
       backdrop-filter: blur(28px);
       box-shadow:
-        0 15px 45px rgba(0,0,0,.8),
-        0 0 45px rgba(0,212,255,.4),
-        inset 0 1px 0 rgba(255,255,255,.2);
+        0 15px 45px rgba(0, 0, 0, .8),
+        0 0 45px rgba(0, 212, 255, .4),
+        inset 0 1px 0 rgba(255, 255, 255, .2);
       position: relative;
       overflow: hidden;
       z-index: 2;
     }
+
     .audit-card::before {
       content: '';
       position: absolute;
@@ -186,21 +265,31 @@
       animation: borderShift 11s linear infinite;
       filter: blur(2.5px);
     }
-    @keyframes borderShift { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+
+    @keyframes borderShift {
+      0% {
+        background-position: 0% 50%
+      }
+
+      100% {
+        background-position: 100% 50%
+      }
+    }
 
     .badge-new {
-      background: rgba(0,212,255,.45);
+      background: rgba(0, 212, 255, .45);
       color: white;
       font-size: .68rem;
       font-weight: 700;
       padding: 4px 12px;
       border-radius: 20px;
-      border: 1px solid rgba(0,212,255,.8);
+      border: 1px solid rgba(0, 212, 255, .8);
       margin-bottom: .7rem;
       letter-spacing: .5px;
       display: inline-block;
-      box-shadow: 0 0 18px rgba(0,212,255,.6);
+      box-shadow: 0 0 18px rgba(0, 212, 255, .6);
     }
+
     .card-title {
       font-size: 1.6rem;
       font-weight: 800;
@@ -208,15 +297,17 @@
       color: white;
       line-height: 1.2;
     }
+
     .card-desc {
       font-size: .92rem;
       color: var(--text-secondary);
       line-height: 1.45;
       margin-bottom: 1.3rem;
     }
+
     .form-control {
-      background: rgba(255,255,255,.15);
-      border: 1px solid rgba(255,255,255,.3);
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .3);
       color: white;
       padding: 13px 16px;
       border-radius: 14px;
@@ -225,13 +316,18 @@
       transition: all .3s ease;
       backdrop-filter: blur(14px);
     }
-    .form-control::placeholder { color: rgba(255,255,255,.7); }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, .7);
+    }
+
     .form-control:focus {
-      background: rgba(0,212,255,.3);
+      background: rgba(0, 212, 255, .3);
       border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(0,212,255,.45);
+      box-shadow: 0 0 0 3px rgba(0, 212, 255, .45);
       outline: none;
     }
+
     .btn-audit {
       width: 100%;
       background: var(--neon-gradient);
@@ -242,22 +338,29 @@
       border-radius: 14px;
       font-size: .98rem;
       transition: all .3s ease;
-      box-shadow: 0 7px 22px rgba(124,58,237,.6);
+      box-shadow: 0 7px 22px rgba(124, 58, 237, .6);
       position: relative;
       overflow: hidden;
     }
+
     .btn-audit::before {
       content: '';
       position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent);
       transition: 0.9s;
     }
-    .btn-audit:hover::before { left: 100%; }
+
+    .btn-audit:hover::before {
+      left: 100%;
+    }
+
     .btn-audit:hover {
       transform: translateY(-2px);
-      box-shadow: 0 14px 30px rgba(124,58,237,.8);
+      box-shadow: 0 14px 30px rgba(124, 58, 237, .8);
     }
 
     .device-mockup {
@@ -268,22 +371,27 @@
       position: relative;
       z-index: 2;
     }
+
     .device-frame {
       position: absolute;
       width: 100%;
       height: 100%;
       border-radius: 32px;
-      background: linear-gradient(135deg, rgba(0,212,255,.45), rgba(124,58,237,.45));
-      border: 2px solid rgba(0,212,255,.9);
+      background: linear-gradient(135deg, rgba(0, 212, 255, .45), rgba(124, 58, 237, .45));
+      border: 2px solid rgba(0, 212, 255, .9);
       box-shadow:
-        0 20px 40px rgba(0,0,0,.8),
-        0 0 50px rgba(0,212,255,.55);
+        0 20px 40px rgba(0, 0, 0, .8),
+        0 0 50px rgba(0, 212, 255, .55);
       transform: rotateY(-12deg) rotateX(6deg);
       animation: floatCompact 5s ease-in-out infinite;
     }
+
     .device-screen {
       position: absolute;
-      top: 16px; left: 16px; right: 16px; bottom: 16px;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
       background: #000;
       border-radius: 16px;
       display: flex;
@@ -295,36 +403,72 @@
       text-shadow: 0 0 20px var(--accent-blue);
       backdrop-filter: blur(10px);
     }
+
     @keyframes floatCompact {
-      0%, 100% { transform: rotateY(-12deg) rotateX(6deg) translateY(0); }
-      50% { transform: rotateY(-12deg) rotateX(6deg) translateY(-8px); }
+
+      0%,
+      100% {
+        transform: rotateY(-12deg) rotateX(6deg) translateY(0);
+      }
+
+      50% {
+        transform: rotateY(-12deg) rotateX(6deg) translateY(-8px);
+      }
     }
 
     .error-msg {
-      background: rgba(255,77,77,.3);
+      background: rgba(255, 77, 77, .3);
       color: #ffb3b3;
       padding: 9px 13px;
       border-radius: 9px;
-      border: 1px solid rgba(255,77,77,.6);
+      border: 1px solid rgba(255, 77, 77, .6);
       font-size: .82rem;
       margin-top: .7rem;
       backdrop-filter: blur(12px);
     }
 
     @media (max-width: 992px) {
-      .hero-title { font-size: 3rem; }
-      .hero-container { flex-direction: column; text-align: center; gap: 1.2rem; }
-      .audit-card { max-width: 360px; }
+      .hero-title {
+        font-size: 3rem;
+      }
+
+      .hero-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.2rem;
+      }
+
+      .audit-card {
+        max-width: 360px;
+      }
     }
+
     @media (max-width: 576px) {
-      .hero-title { font-size: 2.4rem; }
-      .audit-card { padding: 1.6rem; min-width: 280px; }
-      .device-mockup { width: 160px; height: 290px; }
-      .navbar-brand { font-size: 1.4rem; }
-      header { padding: 0.8rem 1rem; }
+      .hero-title {
+        font-size: 2.4rem;
+      }
+
+      .audit-card {
+        padding: 1.6rem;
+        min-width: 280px;
+      }
+
+      .device-mockup {
+        width: 160px;
+        height: 290px;
+      }
+
+      .navbar-brand {
+        font-size: 1.4rem;
+      }
+
+      header {
+        padding: 0.8rem 1rem;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="nebula"></div>
   <div class="stars" id="stars"></div>
@@ -339,7 +483,8 @@
     <div class="hero-content">
       <h1 class="hero-title">Audit. Optimize. Dominate.</h1>
       <p class="hero-subtitle">
-        Instantly uncover performance bottlenecks, security risks, SEO gaps, and accessibility issues — all in one powerful scan.
+        Instantly uncover performance bottlenecks, security risks, SEO gaps, and accessibility issues — all in one
+        powerful scan.
       </p>
     </div>
 
@@ -405,4 +550,5 @@
     }, 3000);
   </script>
 </body>
+
 </html>
