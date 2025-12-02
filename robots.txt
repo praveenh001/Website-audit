@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://website-audit-v3h1.onrender.com/sitemap.xml
